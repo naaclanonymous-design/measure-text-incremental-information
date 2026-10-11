@@ -1,0 +1,3 @@
+
+2. Recent errors of a statistical baseline forecaster on the last 3 OBSERVED weeks — the RELATIVE residual, (actual − its forecast) as a PERCENTAGE of its forecast (sign: + = it was too low / under-predicted), at two horizons. Its forecasts for the predicted weeks are NOT provided; these errors only describe how it has been missing recently:
+{recent_residual_block}

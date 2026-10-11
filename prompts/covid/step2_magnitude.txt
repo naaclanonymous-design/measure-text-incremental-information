@@ -1,0 +1,122 @@
+You are a senior time-series forecasting analyst CONTINUING your own analysis. Every
+quantity is one value of the target time series for a given period (the numeric quantity
+being forecast).
+
+UNITS — READ THIS FIRST. The series is NOT a raw hospitalization count. Every number
+below — the value history, the baseline forecast, the recent baseline errors, and the ±{nochange_band}
+no-change band — is a NORMALIZED ACTIVITY INDEX of weekly COVID-19 hospital admissions for
+one US state: each week's admission count is standardized against the trailing 26-WEEK
+window ending at that week (z-score = (count − 26-week mean) / 26-week standard deviation)
+and then MULTIPLIED BY 100. Therefore 0 = exactly the average level of the preceding
+half-year, +100 = one standard deviation above that recent average, −100 = one standard
+deviation below it, and one index point = 0.01 standard deviation. NEGATIVE values are
+completely normal (below-average activity for the past half-year); the index has NO floor
+at zero and NO fixed ceiling, so never call a negative or a falling-below-zero value
+"impossible". Because the normalization window trails the series, a level that merely holds
+steady for many weeks drifts back toward 0 as the window catches up, and a sharp move is
+amplified relative to a quiet half-year. The report text speaks in real-world quantities
+(counts, percentages, levels): use it for the DIRECTION and STRENGTH of the trend, never
+to match numbers against the index.
+
+In STEP 1 you already decided the DIRECTION of the revision to the baseline for the
+SINGLE target period — predicted week 3 (origin + 3); the nearer periods origin+1 and
+origin+2 are NOT being predicted. Now, in STEP 2, you decide ONLY the SIZE of that
+revision — in the direction that is already fixed. You do NOT change the direction.
+
+================================================================================
+CONTEXT (the same data you saw in Step 1)
+================================================================================
+1. {history_len}-period value history (most recent period last):
+{history_block}
+
+2. Baseline forecast for the single target, predicted week 3 (origin + 3):
+{baseline_block}
+
+3. RECENT BASELINE ERRORS — last {lookback_len} observed periods, the ABSOLUTE residual of
+   the 3-WEEK-AHEAD (far-horizon) forecast, i.e. (actual − baseline forecast) in the
+   series' own index points — the error history of exactly the kind of forecast you are
+   sizing. SIGN: positive = forecast was too LOW (under-predicted); negative = too HIGH.
+   These errors are in the same index-point units as the size classes below, so they are
+   directly comparable:
+{recent_residual_block}
+
+4. Auxiliary text reports (the ORIGINAL report text) describing recent conditions relevant to
+   the series, for the available recent periods, each labelled ONLY by how many periods before
+   the forecast origin it is (oldest first; periods with no report omitted). Specific calendar
+   dates, period numbers, and years have been REMOVED — refer to a report ONLY by its relative
+   order, never by a date:
+{weekly_text_block}
+{momentum_block}
+================================================================================
+YOUR STEP-1 CONCLUSION (fixed — do NOT change the direction)
+================================================================================
+Direction for the target period: {step1_directions}
+Step-1 reasoning:
+{step1_reasoning}
+
+================================================================================
+TASK — STEP 2: SIZE ONLY (the direction is already fixed)
+================================================================================
+For the SINGLE target period (predicted week 3, origin + 3):
+  • If Step 1 said "no change", the size is "none" — keep the baseline; do NOT invent a move.
+  • If Step 1 said "increase" or "decrease", choose exactly ONE size class for HOW BIG the
+    revision is, in that already-chosen direction. The size classes are ABSOLUTE — each
+    describes the revision as a number of index points away from the target period's baseline
+    forecast value, the same width at every level of the series:
+
+{bin_definitions}
+
+The size classes are UNSIGNED — they describe the magnitude of the move in index points
+only; the Step-1 direction supplies the sign (up/down). A larger class means a bigger move
+away from the baseline. Because the classes are absolute, the same class means the same
+change in index points whether the baseline value is high or low — always think in
+index-point terms, never in percent of the level. The class ranges are deliberately UNEQUAL
+in width: they were set so that, historically, about the same share of actual moving
+revisions fell in each class — so no class is intrinsically rare, and a wide top class does
+not mean extreme moves are unlikely.
+
+How to size the target period:
+  • Tie the size to how STRONG and FAST the move is in the report text: a "sharp", "rapid",
+    or multi-period accelerating change supports a LARGER class; "plateauing", "slowing", or
+    "stabilizing" supports a SMALLER class.
+  • Cross-check the recent baseline errors (item 3) — the error history of the far-horizon
+    forecast you are sizing. The errors are already in index points — the same scale as the
+    size classes: if the far-horizon forecast has recently been off by many points in this
+    direction, a larger class is plausible; if only off by a few points, a smaller class.
+  • Be conservative when uncertain: if the evidence does not clearly support a big move, pick
+    the smaller class.
+
+--------------------------------------------------------------------------------
+EVIDENCE — quote sparingly and correctly (this is checked)
+--------------------------------------------------------------------------------
+  • Support your sizing with only a FEW targeted quotes — at most 3 in total; pick the fewest
+    quotes that pin down the size.
+  • Each quote must be a SHORT continuous span (a few words, at most about 10) taken from the
+    report text (item 4). Do NOT stitch fragments together and do NOT quote a whole sentence
+    of your own construction.
+  • Put in quotation marks ONLY wording that genuinely appears in the report text. NEVER quote
+    numbers/values from items 1–3, and NEVER put your own interpretation in quotation marks.
+  • Keep evidence (the quotes) SEPARATE from reasoning (your interpretation) using the output
+    format below: all quotes go on the "Evidence:" line, and the reasoning paragraph contains
+    NO quotation marks.
+
+================================================================================
+OUTPUT FORMAT
+================================================================================
+Return EXACTLY three parts, nothing else:
+  1. A line beginning with the literal token "Evidence:" followed by 1–3 short quotes copied
+     from the report text, each in quotation marks and separated by " | ". Example:
+       Evidence: "climbing steeply for a third week" | "appears to be plateauing"
+  2. ONE reasoning paragraph that interprets that evidence and assigns the size for the target
+     period (no headings, bullets, numeric forecasts, or quotation marks — all wording is
+     your own).
+  3. On a NEW FINAL LINE, the literal token "Sizes:" followed by exactly ONE value,
+     one of: {bin_names} | none. The value MUST be "none" if and only if Step 1 said
+     "no change". Example:
+       Sizes: medium
+
+Hard requirements:
+  • Exactly one value; it is "none" if and only if the Step-1 direction is "no change".
+  • Use only the named size classes above — output NO numbers.
+  • Every quoted phrase must appear only on the "Evidence:" line; the reasoning paragraph has
+    no quotation marks. Nothing after the "Sizes:" line.

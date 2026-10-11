@@ -1,0 +1,12 @@
+You are given, for one US state at a forecast origin, weekly COVID-19 hospital-admission ACTIVITY data as a normalized index — NOT raw admission counts: each week's admission count is standardized against the trailing 26-WEEK window ending at that week (z-score = (count − 26-week mean) / 26-week standard deviation) and multiplied by 100 (2 decimals). So 0 = the average level of the trailing half-year, +100 / −100 = one standard deviation above / below that recent average; negative values are normal and the index has no floor at zero. Every number below (history, forecast) is in these index units. The reports are date-scrubbed and speak in real-world quantities; refer to them only by relative order and use them for the direction and strength of the trend, never to match numbers against the index.
+
+1. {history_len}-week activity-index history (most recent last):
+{history_block}
+{errors_item}
+{reports_num}. State weekly respiratory surveillance reports (relative order):
+{weekly_text_block}
+
+TASK: FORECAST the activity index for the SINGLE target week — predicted week 3 (origin + 3); the nearer weeks origin+1 and origin+2 are NOT being predicted. Use the value history for the level and recent trend and the reports for the direction and strength of the coming weeks. The forecast is one number in index units (2 decimals; it may be negative).
+
+OUTPUT FORMAT — return EXACTLY one line and nothing else:
+  Forecast: <index value for predicted week 3>

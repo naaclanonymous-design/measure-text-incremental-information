@@ -1,0 +1,24 @@
+{
+  "names": [
+    "small",
+    "medium",
+    "large",
+    "very-large"
+  ],
+  "lower_edges": [
+    0.1,
+    0.2155,
+    0.3649,
+    0.6449
+  ],
+  "upper_edges": [
+    0.2155,
+    0.3649,
+    0.6449,
+    6.973
+  ],
+  "epsilon": 0.1,
+  "n_moving": 758,
+  "kind": "relative",
+  "scope": "global_over_run"
+}

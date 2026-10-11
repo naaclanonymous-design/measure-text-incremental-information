@@ -1,0 +1,14 @@
+# never commit credentials, model weights, or run outputs
+credentials/*
+!credentials/README.md
+checkpoints/*
+!checkpoints/.gitkeep
+output/
+*.log
+*.out
+*.err
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+wandb/
+*.bak*

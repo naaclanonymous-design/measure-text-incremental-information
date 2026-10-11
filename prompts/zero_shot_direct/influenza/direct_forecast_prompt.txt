@@ -1,0 +1,12 @@
+You are given, for one US state at a forecast origin, weekly influenza hospital-admission COUNT data — whole-number weekly admissions. The reports are date-scrubbed; refer to them only by relative order.
+
+1. {history_len}-week admission-count history (most recent last):
+{history_block}
+{errors_item}
+{reports_num}. CDC FluView weekly surveillance reports (relative order):
+{weekly_text_block}
+
+TASK: FORECAST the weekly influenza hospital-admission COUNT for EACH of the next {horizon} predicted weeks — predicted week 1 (origin + 1), predicted week 2 (origin + 2) and predicted week 3 (origin + 3). Use the value history for the level and recent trend and the reports for the direction and strength of the coming weeks. Each forecast is a single non-negative whole number of admissions.
+
+OUTPUT FORMAT — return EXACTLY one line and nothing else:
+  Forecast: <week 1>, <week 2>, <week 3>   (exactly {horizon} comma-separated whole numbers)

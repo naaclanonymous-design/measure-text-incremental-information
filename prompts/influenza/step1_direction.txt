@@ -1,0 +1,110 @@
+You are a senior time-series forecasting analyst. Every quantity below is one observed
+value of the target time series for a given period (the numeric quantity being forecast;
+its typical scale depends on the series).
+
+You are given, for one target series at a forecast origin (the most recent fully-observed
+period):
+
+1. {history_len}-period value history (most recent period last):
+{history_block}
+
+2. Baseline forecast (per-period values) for the next {horizon_len} periods — this is the
+   object you are deciding whether to revise:
+{baseline_block}
+
+3. RECENT BASELINE ERRORS at TWO horizons — for the last {lookback_len} OBSERVED periods, the
+   RELATIVE residual, i.e. (actual − baseline forecast) expressed as a PERCENTAGE of that
+   forecast, shown for BOTH the shortest-lead (near-horizon) forecast AND the longest-lead
+   (far-horizon) forecast of each period. SIGN CONVENTION: a POSITIVE percentage means the
+   forecast was too LOW that period (under-predicted); a NEGATIVE percentage means it was too
+   HIGH (over-predicted). The near-horizon errors are most informative for the NEAR horizon
+   periods; the far-horizon errors for the FAR horizon period. These percentages are directly
+   comparable to the ±{nochange_band} no-change band below:
+{recent_residual_block}
+
+4. Auxiliary text reports (the ORIGINAL report text) describing recent conditions relevant to
+   the series, for the available recent periods, each labelled ONLY by how many periods before
+   the forecast origin it is (oldest first; periods with no report are omitted). Specific
+   calendar dates, period numbers, and years have been REMOVED from the reports — refer to a
+   report ONLY by its relative order (e.g. "the report from two periods before the origin"),
+   NEVER by a date. This text is your PRIMARY evidence:
+{weekly_text_block}
+{momentum_block}
+================================================================================
+TASK — STEP 1: DIRECTION ONLY
+================================================================================
+For EACH of the next {horizon_len} periods, decide ONLY which way the baseline should be
+revised:
+    increase   — the truth is likely ABOVE the baseline (revise up)
+    decrease   — the truth is likely BELOW the baseline (revise down)
+    no change  — the baseline is already accurate; keep it unchanged
+
+Do NOT give any number or size yet. Output only the direction for each period.
+
+--------------------------------------------------------------------------------
+IMPORTANT — the NO-CHANGE band (read carefully; it is RELATIVE)
+--------------------------------------------------------------------------------
+The baseline is already a strong forecast. "no change" does NOT mean the change is exactly
+zero — it means the warranted change is SMALL RELATIVE TO THE BASELINE. There is a
+proportional tolerance band of ±{nochange_band} of the baseline value around each period's
+baseline:
+
+  • If the change you would make is within ±{nochange_band} of that period's baseline value
+    (e.g. a move of 8 on a baseline of 100), you MUST call it "no change" — treat the baseline
+    as already accurate and keep it unchanged.
+  • Only call "increase" or "decrease" when the evidence points to a change CLEARLY LARGER
+    than ±{nochange_band} of the baseline value for that period.
+  • The band is proportional: the same absolute move can be "no change" at a high level but a
+    real "increase"/"decrease" at a low one. Always compare the move to the baseline level of
+    THAT period.
+  • Do NOT turn weak, vague, or ambiguous text into a direction. When the report text gives no
+    clear up/down signal, the correct answer is "no change".
+
+--------------------------------------------------------------------------------
+How to reason (one flowing paragraph, then the final line)
+--------------------------------------------------------------------------------
+  • Read the report text first. Ground each claim in a SHORT quote about the recent state of
+    the series — still rising, plateauing, at/just past a peak, or declining — and say what
+    each implies. Refer to each report only by its relative order, never by a calendar date.
+  • Read the recent baseline errors (item 3), MATCHING THE HORIZON: use the near-horizon error
+    pattern to judge the NEAR horizon periods and the far-horizon error pattern to judge the
+    FAR horizon period. The errors are already percentages of the forecast, so compare them
+    directly to the ±{nochange_band} band. If the relevant-horizon forecast has been
+    consistently too LOW (positive percentages beyond the band) and the series is still rising,
+    it is probably still too low → increase; if consistently too HIGH (negative percentages)
+    and the series is declining → decrease; if those recent errors are small or mixed and the
+    series is stable → no change.
+  • Combine the text and the recent errors for EACH period, then apply the ±{nochange_band}
+    relative no-change band: only commit to increase/decrease when the evidence supports a
+    move clearly bigger than {nochange_band} of that period's baseline; otherwise say no change.
+  • Every "increase"/"decrease" must be backed by a quoted report phrase and/or the
+    recent-error pattern.
+
+--------------------------------------------------------------------------------
+HOW TO QUOTE (this is checked — follow exactly)
+--------------------------------------------------------------------------------
+  • Quote ONLY to ground a claim in the report text (item 4).
+  • Copy a SHORT span — a few words, at most about 10 — as it appears in the report. Keep each
+    quote to a single continuous phrase; do NOT stitch two separate fragments into one quote,
+    and do NOT stretch a quote across a full sentence of your own construction.
+  • Put in quotation marks ONLY wording that genuinely appears in the report text. NEVER place
+    in quotation marks your own analysis, conclusions, or any number/value from the history,
+    baseline, or error figures (items 1–3). Those are not report text.
+  • All interpretation goes OUTSIDE the quotation marks, in your own words.
+  • Prefer a small number of well-chosen quotes over many. A quote must carry its meaning
+    faithfully, but it need not be a long or exact copy.
+
+================================================================================
+OUTPUT FORMAT
+================================================================================
+Return EXACTLY two parts, nothing else:
+  1. ONE reasoning paragraph (no headings, bullets, markdown, or numbers stated as a forecast).
+  2. On a NEW FINAL LINE, the literal token "Directions:" followed by exactly {horizon_len}
+     comma-separated values, each one of: increase | decrease | no change. Example:
+       Directions: increase, increase, no change
+
+Hard requirements:
+  • The final line must contain exactly {horizon_len} direction words and nothing else.
+  • Each must be exactly one of "increase", "decrease", or "no change".
+  • Do not output any magnitude, number, or bin in this step.
+  • Begin immediately with the reasoning paragraph — no preamble or heading.

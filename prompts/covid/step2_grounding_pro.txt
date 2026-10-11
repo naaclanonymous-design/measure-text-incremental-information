@@ -1,0 +1,60 @@
+You are a senior time-series forecasting reviewer auditing whether the SIZE of a forecast
+revision is justified by the evidence. The revision DIRECTION for each of the {horizon_len}
+target periods — predicted week 2 (origin + 2) and predicted week 3 (origin + 3); origin+1
+is not predicted — is already fixed (given below); the analyst only chose an unsigned
+SIZE CLASS per period describing how big the move away from the baseline is. The size
+classes are ABSOLUTE — each describes the revision as a number of index points away from
+that period's baseline value, the same width at every level of the series:
+
+UNITS (for your audit): every number in the analyst's data is a NORMALIZED ACTIVITY INDEX,
+not a raw count — the state's weekly COVID-19 hospital admissions standardized against the
+trailing 26-week window (z-score) and multiplied by 100 (0 = the trailing half-year average,
+±100 = one standard deviation). Negative values are normal and the index has no floor at
+zero; an argument that treats a negative or below-zero baseline as "impossible", or that
+reads index values as counts or percentages, is UNSOUND reasoning.
+
+{bin_definitions}
+
+The class ranges are deliberately UNEQUAL in width — they were set so that, historically,
+about the same share of actual moving revisions fell in each class, so no class is
+intrinsically rare. A larger class should be justified by stronger, faster, accelerating signals in the
+report text (e.g. "sharp"/"rapid"/"continuing to climb steeply") and/or a recent residual
+that is large and persistent in index points; a smaller class fits
+"plateauing"/"slowing"/"stabilizing" language or a small recent residual. You are NOT given
+the ground truth — judge only whether the chosen SIZE per period is consistent with the
+cited evidence and is not an over- or under-statement.
+
+================================================================================
+Auxiliary report text (date-scrubbed; relative order)
+================================================================================
+{weekly_text_block}
+
+================================================================================
+Recent baseline residuals — (actual − baseline) in index points (+ = baseline too low)
+================================================================================
+{recent_residual_block}
+
+================================================================================
+Fixed directions (per period)      :  {directions}
+Analyst's chosen size classes      :  {sizes}
+================================================================================
+
+================================================================================
+The analyst's size reasoning
+================================================================================
+{cot}
+
+================================================================================
+TASK
+================================================================================
+For each horizon period, say whether the chosen size is well-justified, too large, or
+too small given the evidence. Then give an overall score.
+
+OUTPUT FORMAT — return EXACTLY:
+  1. One short line per horizon period (period index + justified / too-large / too-small).
+  2. A FINAL LINE: the literal token "Score:" followed by an integer 1–5, where
+       5 = every size class is well-justified by the cited evidence;
+       3 = mostly justified but at least one period is mis-sized;
+       1 = the sizes are not justified by the evidence.
+     Example:
+       Score: 4

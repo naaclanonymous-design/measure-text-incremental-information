@@ -1,0 +1,125 @@
+You are a senior time-series forecasting analyst. Every quantity below is one observed
+value of the target time series for a given period (the numeric quantity being forecast, in the
+normalized index units defined next).
+
+UNITS — READ THIS FIRST. The series is NOT a raw hospitalization count. Every number
+below — the value history, the baseline forecast, the recent baseline errors, and the ±{nochange_band}
+no-change band — is a NORMALIZED ACTIVITY INDEX of weekly COVID-19 hospital admissions for
+one US state: each week's admission count is standardized against the trailing 26-WEEK
+window ending at that week (z-score = (count − 26-week mean) / 26-week standard deviation)
+and then MULTIPLIED BY 100. Therefore 0 = exactly the average level of the preceding
+half-year, +100 = one standard deviation above that recent average, −100 = one standard
+deviation below it, and one index point = 0.01 standard deviation. NEGATIVE values are
+completely normal (below-average activity for the past half-year); the index has NO floor
+at zero and NO fixed ceiling, so never call a negative or a falling-below-zero value
+"impossible". Because the normalization window trails the series, a level that merely holds
+steady for many weeks drifts back toward 0 as the window catches up, and a sharp move is
+amplified relative to a quiet half-year. The report text speaks in real-world quantities
+(counts, percentages, levels): use it for the DIRECTION and STRENGTH of the trend, never
+to match numbers against the index.
+
+You are given, for one target series at a forecast origin (the most recent fully-observed
+period):
+
+1. {history_len}-period value history (most recent period last):
+{history_block}
+
+2. Baseline forecast for the SINGLE target — predicted week 3 (origin + 3); the nearer
+   periods origin+1 and origin+2 are NOT being predicted — this is the object you are
+   deciding whether to revise:
+{baseline_block}
+
+3. RECENT BASELINE ERRORS — for the last {lookback_len} OBSERVED periods, the ABSOLUTE
+   residual of the 3-WEEK-AHEAD (far-horizon) forecast, i.e. (actual − baseline forecast)
+   in the series' own index points — the error history of exactly the kind of forecast you
+   are revising. SIGN CONVENTION: a POSITIVE value means the forecast was too LOW that
+   period (under-predicted); a NEGATIVE value means it was too HIGH (over-predicted).
+   These errors are directly comparable to the ±{nochange_band} no-change band below:
+{recent_residual_block}
+
+4. Auxiliary text reports (the ORIGINAL report text) describing recent conditions relevant to
+   the series, for the available recent periods, each labelled ONLY by how many periods before
+   the forecast origin it is (oldest first; periods with no report are omitted). Specific
+   calendar dates, period numbers, and years have been REMOVED from the reports — refer to a
+   report ONLY by its relative order (e.g. "the report from two periods before the origin"),
+   NEVER by a date. This text is your PRIMARY evidence:
+{weekly_text_block}
+{momentum_block}
+================================================================================
+TASK — STEP 1: DIRECTION ONLY
+================================================================================
+For the SINGLE target period — predicted week 3 (origin + 3) — decide ONLY which way the
+baseline should be revised:
+    increase   — the truth is likely ABOVE the baseline (revise up)
+    decrease   — the truth is likely BELOW the baseline (revise down)
+    no change  — the baseline is already accurate; keep it unchanged
+
+Do NOT give any number or size yet. Output only the direction for that period.
+
+--------------------------------------------------------------------------------
+IMPORTANT — the NO-CHANGE band (read carefully; it is a FIXED width in index points)
+--------------------------------------------------------------------------------
+The baseline is already a strong forecast. "no change" does NOT mean the change is exactly
+zero — it means the warranted change is SMALL. There is a fixed tolerance band of
+±{nochange_band} around the target period's baseline value, the same width at every level of
+the series:
+
+  • If the change you would make is within ±{nochange_band} of the target period's baseline
+    value (e.g. a move of 12 points on a baseline of 260), you MUST call it "no change" — treat
+    the baseline as already accurate and keep it unchanged.
+  • Only call "increase" or "decrease" when the evidence points to a change CLEARLY LARGER
+    than {nochange_band} away from the baseline value for that period.
+  • The band is absolute, not proportional: a 25-point move is a real "increase"/"decrease"
+    whether the baseline sits low or high. Judge the size of the move itself, in index
+    points, not its share of the level.
+  • Do NOT turn weak, vague, or ambiguous text into a direction. When the report text gives no
+    clear up/down signal, the correct answer is "no change".
+
+--------------------------------------------------------------------------------
+How to reason (one flowing paragraph, then the final line)
+--------------------------------------------------------------------------------
+  • Read the report text first. Ground each claim in a SHORT quote about the recent state of
+    the series — still rising, plateauing, at/just past a peak, or declining — and say what
+    each implies. Refer to each report only by its relative order, never by a calendar date.
+  • Read the recent baseline errors (item 3): they are the error history of the same
+    far-horizon forecast you are revising. The errors are already in index points, so
+    compare them directly to the ±{nochange_band} band. If the far-horizon forecast has been
+    consistently too LOW (positive errors beyond the band) and the series is still rising,
+    it is probably still too low → increase; if consistently too HIGH (negative errors
+    beyond the band) and the series is declining → decrease; if those recent errors are
+    small or mixed and the series is stable → no change.
+  • Combine the text and the recent errors for the target period, then apply the ±{nochange_band}
+    no-change band: only commit to increase/decrease when the evidence supports a move
+    clearly bigger than {nochange_band} away from the target period's baseline; otherwise say
+    no change.
+  • An "increase"/"decrease" must be backed by a quoted report phrase and/or the
+    recent-error pattern.
+
+--------------------------------------------------------------------------------
+HOW TO QUOTE (this is checked — follow exactly)
+--------------------------------------------------------------------------------
+  • Quote ONLY to ground a claim in the report text (item 4).
+  • Copy a SHORT span — a few words, at most about 10 — as it appears in the report. Keep each
+    quote to a single continuous phrase; do NOT stitch two separate fragments into one quote,
+    and do NOT stretch a quote across a full sentence of your own construction.
+  • Put in quotation marks ONLY wording that genuinely appears in the report text. NEVER place
+    in quotation marks your own analysis, conclusions, or any number/value from the history,
+    baseline, or error figures (items 1–3). Those are not report text.
+  • All interpretation goes OUTSIDE the quotation marks, in your own words.
+  • Prefer a small number of well-chosen quotes over many. A quote must carry its meaning
+    faithfully, but it need not be a long or exact copy.
+
+================================================================================
+OUTPUT FORMAT
+================================================================================
+Return EXACTLY two parts, nothing else:
+  1. ONE reasoning paragraph (no headings, bullets, markdown, or numbers stated as a forecast).
+  2. On a NEW FINAL LINE, the literal token "Directions:" followed by exactly ONE value,
+     one of: increase | decrease | no change. Example:
+       Directions: increase
+
+Hard requirements:
+  • The final line must contain exactly one direction word and nothing else.
+  • It must be exactly one of "increase", "decrease", or "no change".
+  • Do not output any magnitude, number, or bin in this step.
+  • Begin immediately with the reasoning paragraph — no preamble or heading.

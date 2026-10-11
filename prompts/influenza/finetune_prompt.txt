@@ -1,0 +1,21 @@
+{intro}
+
+1. {history_header}
+{history_block}
+
+2. {baseline_header}
+{baseline_block}
+
+3. Recent baseline errors at two horizons over the last 3 observed weeks — the RELATIVE residual, (actual − baseline) as a PERCENTAGE of the baseline (sign: + = baseline too low / under-predicted), directly comparable to the ±10% no-change band:
+{recent_residual_block}
+
+4. {reports_header}
+{weekly_text_block}
+
+TASK: Reason step by step, then for EACH predicted week decide (a) the DIRECTION the baseline should be revised, and (b) the SIZE of that revision (a magnitude class).
+
+OUTPUT FORMAT — return EXACTLY three parts:
+  Reasoning: <one flowing reasoning paragraph>
+
+  Direction: {horizon} comma-separated values, each one of: increase | decrease | no change
+  Size: {horizon} comma-separated values, each one of: {bin_names} | none  (use "none" for exactly the weeks whose Direction is "no change").
