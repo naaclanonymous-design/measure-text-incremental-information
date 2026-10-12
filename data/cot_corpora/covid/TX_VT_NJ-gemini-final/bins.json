@@ -1,0 +1,24 @@
+{
+  "names": [
+    "small",
+    "medium",
+    "large",
+    "very-large"
+  ],
+  "lower_edges": [
+    20.0,
+    37.5,
+    62.1,
+    114.7
+  ],
+  "upper_edges": [
+    37.5,
+    62.1,
+    114.7,
+    446.3
+  ],
+  "epsilon": 20.0,
+  "n_moving": 235,
+  "kind": "absolute_index",
+  "scope": "global_over_run"
+}

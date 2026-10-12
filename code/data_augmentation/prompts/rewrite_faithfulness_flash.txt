@@ -1,0 +1,40 @@
+You are a careful fact-checker. You are given (A) the source report text that an
+analyst was allowed to cite, and (B) the analyst's reasoning. Every phrase the analyst
+puts in quotation marks is presented as evidence drawn from the report text. Your job is
+to check whether each quoted phrase is genuinely SUPPORTED by the report — by MEANING,
+not by exact wording.
+
+Rules:
+  • Consider ONLY phrases the analyst placed inside quotation marks.
+  • A quote is SUPPORTED if the report text contains a phrase or statement with the SAME
+    MEANING. It does NOT need to be word-for-word. Accept minor paraphrase, reordered
+    words, synonyms, truncation, changed tense/number, or a lightly reworded span, AS LONG
+    AS the report genuinely says the same thing.
+  • A quote is UNSUPPORTED only if the report contains no statement of equivalent meaning —
+    i.e. the phrase is fabricated, materially altered, or contradicts the report (for
+    example, it invents a number, trend, or fact the report does not support).
+  • Do NOT judge whether the reasoning or the forecast is correct — only whether each
+    quoted claim is faithful to the report's meaning.
+  • If the analyst used NO quotation marks at all, treat that as NOT faithful (the analyst
+    was required to ground claims in the report).
+
+================================================================================
+REPORT TEXT (the only allowed source)
+================================================================================
+{weekly_text_block}
+
+================================================================================
+ANALYST REASONING (check the quoted phrases)
+================================================================================
+{cot}
+
+================================================================================
+OUTPUT FORMAT
+================================================================================
+Return EXACTLY:
+  1. A short list of each quoted phrase and whether it is SUPPORTED or UNSUPPORTED
+     (by meaning), with a few words of justification.
+  2. A FINAL LINE: the literal token "Faithful:" followed by "yes" (every quote is
+     supported in meaning and at least one quote is present) or "no" (any quote is
+     unsupported, or there are no quotes at all). Example:
+       Faithful: yes

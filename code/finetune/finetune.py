@@ -173,7 +173,10 @@ HORIZON = {"chronos2": 3, "flat": 2, "chronos2_full": 3}
 DATA_MODES = ("influenza", "finance_stat", "finance_TSFM", "covid_TSFM", "covid_TSFM_updated",
               "covid_TSFM_bitong", "covid_TSFM_bitong_org")
 INFLUENZA_MODES = ("influenza",)
-NORES_MODES = ()                     # the "no residuals" prompt variants are not part of this release
+# "no residuals": the COVID finetune prompt (prompts/covid/finetune_prompt.txt) shows NO recent-error
+# item — history, baseline, reports only — as in the reported COVID run; the residual block is still
+# loaded (used by the offline evaluation) but never rendered into a COVID prompt
+NORES_MODES = ("covid_TSFM_updated", "covid_TSFM_bitong", "covid_TSFM_bitong_org")
 COVID_MODES = ("covid_TSFM", "covid_TSFM_updated", "covid_TSFM_bitong", "covid_TSFM_bitong_org")
 # the z26w (trailing-26-week z-score, origin+3 only) covid modes: identical units/prompt/horizon
 COVID_Z26W_MODES = ("covid_TSFM_updated", "covid_TSFM_bitong", "covid_TSFM_bitong_org")
@@ -444,6 +447,13 @@ ABSTAIN_REASONING_BY_MODE = {
         "ambiguous signals, the baseline is treated as already the best available forecast "
         "and is kept unchanged (no change, no size)."),
 }
+# the COVID prompt shows no recent-error block, so the canned fallback must not mention it
+# (the released -gemini-final corpus carries an input-specific abstain_cot anyway)
+ABSTAIN_REASONING_BY_MODE["covid_TSFM_updated"] = (
+    "The available state respiratory surveillance text does not provide clear, consistent "
+    "evidence for which way the baseline should be revised for predicted week 3 (origin + 3). "
+    "Rather than over-read weak or ambiguous signals, the baseline is treated as already the "
+    "best available forecast and is kept unchanged (no change, no size).")
 ABSTAIN_REASONING_BY_MODE["covid_TSFM_bitong"] = ABSTAIN_REASONING_BY_MODE["covid_TSFM_updated"]
 ABSTAIN_REASONING_BY_MODE["covid_TSFM_bitong_org"] = ABSTAIN_REASONING_BY_MODE["covid_TSFM_updated"]
 
@@ -696,6 +706,9 @@ DEFAULT_FINETUNE_PROMPT = {
         "under-predicted), directly comparable to the ±10% no-change band:\n{recent_residual_block}\n\n"
         "4. {reports_header}\n{weekly_text_block}\n\n" + _TASK),
     # covid_TSFM (prompt subdir chronos2_full_abs): ABSOLUTE index-point band / residuals
+    # covid z26w modes (prompt file prompts/covid/finetune_prompt.txt): NO recent-error item,
+    # the reports are item 3. Fallback only, written when that file is absent.
+    "chronos2_full_abs_t3": "{intro}\n\n1. {history_header}\n{history_block}\n\n2. {baseline_header}\n{baseline_block}\n\n3. {reports_header}\n{weekly_text_block}\n\nTASK: Reason step by step, then for the SINGLE predicted week — the far horizon, origin + 3 (the nearer weeks origin+1 and origin+2 are NOT being predicted) — decide (a) the DIRECTION the baseline should be revised, and (b) the SIZE of that revision (a magnitude class). The baseline forecast extrapolates the recent numeric trend of the index. Read the reports first and decide which phase the epidemic is in (rising / near a peak / declining / low and stable), then judge whether the baseline forecast for predicted week 3 is consistent with that phase given the value history. The reports are your primary evidence; the value history is the context they are read against. Only call increase or decrease when the evidence supports a move clearly larger than the ±20-index-point no-change band away from the baseline; otherwise say no change.\n\nOUTPUT FORMAT — return EXACTLY three parts:\n  " + REASONING_TAG + " <one flowing reasoning paragraph>\n\n  " + DIRECTION_TAG + " {horizon} comma-separated values, each one of: increase | decrease | no change\n  " + SIZE_TAG + " {horizon} comma-separated values, each one of: {bin_names} | none  (use \"none\" if and only if the Direction is \"no change\").",
     "chronos2_full_abs": (
         "{intro}\n\n"
         "1. {history_header}\n{history_block}\n\n"
@@ -770,7 +783,7 @@ PROMPT_WORDING = {
                   "(2 decimals). So 0 = the average level of the trailing half-year, "
                   "+100 / −100 = one standard deviation above / below that recent average; "
                   "negative values are normal and the index has no floor at zero. Every "
-                  "number below (history, baseline forecast, recent errors, the no-change "
+                  "number below (history, baseline forecast, the no-change "
                   "band) is in these index units. The reports are date-scrubbed and speak in "
                   "real-world quantities; refer to them only by relative order and use them "
                   "for the direction and strength of the trend, never to match numbers "
@@ -2267,6 +2280,9 @@ def main():
     if args.reasoning_style != "cot":       # target reasoning ablation (read by build_target_text)
         global REASONING_STYLE
         REASONING_STYLE = args.reasoning_style
+        if args.reasoning_style == "residual" and args.data_mode in NORES_MODES:
+            sys.exit("--reasoning-style residual restates the recent_residual_block, which the "
+                     f"{args.data_mode} prompt does not show")
         print(f"[reasoning-style] assistant targets use style {args.reasoning_style!r}")
     if args.max_seq_len is None:
         args.max_seq_len = BITONG_MAX_SEQ_LEN if bitong else MAX_SEQ_LEN

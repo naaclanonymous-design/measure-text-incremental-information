@@ -1,13 +1,10 @@
-# data building (data/COVID/build_scripts, data/Influenza/build_scripts) and the CoT pipeline
+# data building (code/data_build), the CoT pipeline (code/cot_generation) and code/data_augmentation
 pandas>=2.0
 numpy>=1.24
-google-genai>=1.0          # Gemini via Vertex AI (code/cot_generation, corpus_builders, zero_shot)
+google-genai>=1.0          # Gemini via Vertex AI (code/cot_generation, data_augmentation, zero_shot)
 openai>=1.50               # GPT-5.4 (zero_shot) / optional --model GPT in the CoT pipeline
-matplotlib>=3.7            # charts only
-requests>=2.31             # data/COVID/build_scripts/download_state_reports.py
-pymupdf4llm>=0.0.17        # download_state_reports.py (PDF -> text), optional
 
-# Chronos-2 baseline (data/COVID/chronos2): a GPU-capable torch build + chronos-forecasting >= 2.0
+# Chronos-2 baseline (code/chronos2): a GPU-capable torch build + chronos-forecasting >= 2.0
 torch>=2.3
 chronos-forecasting>=2.0
 

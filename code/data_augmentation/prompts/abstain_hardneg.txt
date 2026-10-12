@@ -1,0 +1,94 @@
+You are a senior time-series forecasting analyst. Every quantity below is one observed
+value of the target time series for a given period (the numeric quantity being forecast, in the
+normalized index units defined next).
+
+UNITS — READ THIS FIRST. The series is NOT a raw hospitalization count. Every number
+below — the value history, the baseline forecast, the recent baseline errors, and the ±{nochange_band}
+no-change band — is a NORMALIZED ACTIVITY INDEX of weekly COVID-19 hospital admissions for
+one US state: each week's admission count is standardized against the trailing 26-WEEK
+window ending at that week (z-score = (count − 26-week mean) / 26-week standard deviation)
+and then MULTIPLIED BY 100. Therefore 0 = exactly the average level of the preceding
+half-year, +100 = one standard deviation above that recent average, −100 = one standard
+deviation below it, and one index point = 0.01 standard deviation. NEGATIVE values are
+completely normal; the index has NO floor at zero and NO fixed ceiling. Because the
+normalization window trails the series, a level that merely holds steady for many weeks
+drifts back toward 0 as the window catches up, and a sharp move is amplified relative to a
+quiet half-year. The report text speaks in real-world quantities (counts, percentages,
+levels): use it for the DIRECTION and STRENGTH of the trend, never to match numbers
+against the index.
+
+You are given, for one target series at a forecast origin (the most recent fully-observed
+period):
+
+1. {history_len}-period value history (most recent period last):
+{history_block}
+
+2. Baseline forecast for the SINGLE target — predicted week 3 (origin + 3); the nearer
+   periods origin+1 and origin+2 are NOT being predicted — this is the object being
+   revised or kept:
+{baseline_block}
+
+3. RECENT BASELINE ERRORS — for the last {lookback_len} OBSERVED periods, the ABSOLUTE
+   residual of the 3-WEEK-AHEAD forecast, i.e. (actual − baseline forecast) in index
+   points. SIGN CONVENTION: POSITIVE = the forecast was too LOW (under-predicted);
+   NEGATIVE = too HIGH (over-predicted). Directly comparable to the ±{nochange_band} band:
+{recent_residual_block}
+
+4. Auxiliary text reports (the ORIGINAL report text), each labelled ONLY by how many
+   periods before the forecast origin it is (oldest first; periods with no report are
+   omitted). Calendar dates have been REMOVED — refer to a report ONLY by its relative
+   order, NEVER by a date. This text is your PRIMARY evidence:
+{weekly_text_block}
+
+5. A colleague's argument that the baseline should be revised ({argument_direction}). It
+   quotes the same reports. Read it carefully — it is the case you must answer:
+{argument_block}
+
+================================================================================
+TASK — WHY THE BASELINE SHOULD BE KEPT (a grounded "no change")
+================================================================================
+The correct call for this origin is "no change": the warranted revision of the baseline for
+predicted week 3 is within the ±{nochange_band} no-change band. Your job is to write the
+reasoning an expert would give for keeping the baseline DESPITE the colleague's argument —
+an honest, checkable analysis, not an excuse. Start by acknowledging, with short quotes,
+the strongest evidence the colleague relies on. Then explain, from the numbers and the
+reports themselves, why that evidence does not justify a move larger than {nochange_band}
+index points away from the baseline. You may use ONLY these kinds of reasons, and each one
+you use must be visibly tied to items 1–4:
+
+  • baseline-already-reflects : the baseline forecast (item 2) already prices in the trend
+    the reports describe — compare the history (item 1) and the baseline level/direction;
+    a trend the baseline already projects is a reason to trust it, not to revise it.
+  • residuals-contradict : the recent far-horizon errors (item 3) point the other way or
+    sit inside the band — the same kind of forecast has recently NOT erred in the direction
+    the colleague proposes.
+  • reports-weak : the reports conflict with each other across periods, are stale or
+    generic, or carry explicit caveats (for example reduced or voluntary reporting) that
+    limit what the quoted phrases can support.
+
+Do NOT invent facts, numbers, or report content. Do NOT mention the actual outcome — you
+do not know it and must argue from the inputs alone. Do NOT dismiss the reports
+wholesale: engage with the specific evidence quoted by the colleague.
+
+--------------------------------------------------------------------------------
+HOW TO QUOTE (this is checked — follow exactly)
+--------------------------------------------------------------------------------
+  • Quote ONLY to ground a claim in the report text (item 4). Copy a SHORT span — a few
+    words, at most about 10 — as it appears in the report; one continuous phrase per quote.
+  • Put in quotation marks ONLY wording that genuinely appears in the report text. NEVER
+    quote your own analysis, the colleague's sentences, or any number from items 1–3.
+  • All interpretation goes OUTSIDE the quotation marks, in your own words.
+  • Use at least one quote and prefer a few well-chosen ones.
+
+================================================================================
+OUTPUT FORMAT
+================================================================================
+Return EXACTLY three parts, nothing else:
+  1. ONE reasoning paragraph (no headings, bullets, markdown, or numbers stated as a
+     forecast), beginning immediately — no preamble.
+  2. On a NEW LINE, the literal token "Directions:" followed by exactly: no change
+  3. On the FINAL LINE, the literal token "Reason:" followed by the reason kind(s) you
+     actually used, comma-separated, from: baseline-already-reflects, residuals-contradict,
+     reports-weak. Example:
+       Directions: no change
+       Reason: baseline-already-reflects, residuals-contradict

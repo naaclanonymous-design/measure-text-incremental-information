@@ -8,7 +8,7 @@
 # Usage: run_zero_shot.sh influenza|covid [keep|drop|both] [gemini,gpt] [extra args...]
 #   influenza : --data-mode influenza (GA/NY/NJ test split of the released corpus, 101 rows)
 #   covid     : --data-mode covid_TSFM_bitong_org (TX/VT/NJ final test block, 78 rows; the
-#               finetune prompt of prompts/covid with the recent-error item)
+#               finetune prompt of prompts/covid, which has NO recent-error item)
 # Credentials: Gemini via Vertex AI ADC (GOOGLE_CLOUD_PROJECT); GPT via OPENAI_API_KEY or
 #              credentials/openai_api_key.json.
 # Output: $PAPER_OUTPUT_ROOT/zero_shot/<data_mode>/chronos2_full/<combo>/<text5wk_input|
@@ -21,8 +21,8 @@ TEXT="${2:-both}"; PROVIDERS="${3:-gemini,gpt}"; shift $(( $# >= 3 ? 3 : $# ))
 PYTHON="${PYTHON:-python}"
 cd "$(dirname "${BASH_SOURCE[0]}")"
 case "$DATASET" in
-  influenza) ARGS=(--data-mode influenza --corpus-model gemini --states GA,NY,NJ) ;;
-  covid)     ARGS=(--data-mode covid_TSFM_bitong_org --corpus-model gemini --states TX,VT,NJ) ;;
+  influenza) ARGS=(--data-mode influenza --corpus-model gemini-final --states GA,NY,NJ) ;;
+  covid)     ARGS=(--data-mode covid_TSFM_bitong_org --corpus-model gemini-final --states TX,VT,NJ) ;;
   *) echo "unknown dataset: $DATASET"; exit 1 ;;
 esac
 [[ "$TEXT" == "both" ]] && VARIANTS=(keep drop) || VARIANTS=("$TEXT")

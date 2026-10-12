@@ -20,9 +20,13 @@ set**. The code picks the directory by data mode (`paper_paths.prompt_dir_for`):
 ## `covid/` — COVID (data mode `covid_TSFM_updated` for generation, `covid_TSFM_bitong` for finetuning)
 
 The same eight files, worded for the 100 × 26-week z-score index, the absolute ±20-point band
-and the single far-horizon target (origin + 3); `finetune_prompt.txt` holds the four input items
-(history, baseline, recent 3-week-ahead baseline errors, reports) followed by the task and the
-output format.
+and the single far-horizon target (origin + 3). The CoT-generation prompts show the recent
+3-week-ahead baseline errors; `finetune_prompt.txt` does NOT: it holds three input items
+(history, baseline, reports) followed by the task and the output format, the "no residuals"
+variant used by the reported COVID run (its corpus, `-gemini-final`, is rewritten to match).
+
+The prompts of the corpus-derivation stages (COVID abstain fix and nores rewrite) live with their
+scripts in `code/data_augmentation/prompts/`.
 
 ## `zero_shot_direct/` — the direct-forecast zero-shot test
 

@@ -219,7 +219,7 @@ def parse_args():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--data-mode", type=str, default=C.DATA_MODE_DEFAULT, choices=C.DATA_MODES,
-                   help="input-data source: 'influenza' (per-state CSVs in data/Influenza_data) "
+                   help="input-data source: 'influenza' (per-state CSVs in data/Influenza) "
                         "or 'finance_stat' (per-ticker CSVs in weekly_with_news/organized, "
                         "stat_pred_3w baseline). The generation method is identical; only the "
                         "input data differs. finance_stat requires --mode chronos2_full")

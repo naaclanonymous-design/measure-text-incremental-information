@@ -1,0 +1,84 @@
+You are editing a forecasting analyst's written reasoning. The analyst revised a baseline
+forecast of a weekly COVID-19 hospital-admission ACTIVITY INDEX for one US state. Their
+CONCLUSION (direction and size class) is FIXED and correct; only the reasoning text is
+being edited.
+
+UNITS. The series is a normalized index, NOT a raw count: each week's admission count is
+standardized against the trailing 26-week window (z-score = (count − 26-week mean) /
+26-week standard deviation) and multiplied by 100. 0 = the average level of the trailing
+half-year; +100 / −100 = one standard deviation above / below it; negative values are
+normal. The no-change band is ±{nochange_band} around the baseline.
+
+WHY THIS EDIT. The original reasoning was written with a block of "recent baseline
+errors" (the sign and size of the baseline's misses over the previous three weeks) and
+was told to treat that block as its main numeric signal. On this index that signal does
+NOT predict the next miss, and the finetuned model must never see or reason from it. The
+edited reasoning must therefore stand on the REPORT TEXT and the VALUE HISTORY alone.
+
+--------------------------------------------------------------------------------
+INPUTS THE MODEL WILL SEE (the only material the edited reasoning may rely on)
+--------------------------------------------------------------------------------
+1. {history_len}-week activity-index history (most recent last):
+{history_block}
+
+2. Baseline forecast (activity index) for the SINGLE target, predicted week 3 (origin + 3):
+{baseline_block}
+
+3. State weekly respiratory surveillance reports (date-scrubbed; oldest → newest; refer to
+   them ONLY by relative order):
+{weekly_text_block}
+
+--------------------------------------------------------------------------------
+THE RECORD BEING EDITED
+--------------------------------------------------------------------------------
+Record kind: {record_kind}
+Fixed conclusion for predicted week 3 (origin + 3):
+{conclusion_line}
+
+Original reasoning (may contain a DIRECTION part and, for moves, a SIZE part):
+{original_reasoning}
+{feedback_block}
+--------------------------------------------------------------------------------
+EDIT RULES (follow exactly)
+--------------------------------------------------------------------------------
+1. REMOVE every sentence, clause or phrase that refers to the recent baseline errors /
+   residuals / far-horizon errors / 3-week-ahead errors, to the baseline having been "too
+   low" or "too high", "under-predicting" or "over-predicting", "calibrated", or to any
+   error figure in index points. Remove BOTH sign-based uses ("errors have been
+   persistently positive, so the baseline is still too low") AND magnitude-based uses
+   ("recent errors are within the band, so the baseline is well calibrated"). These
+   numbers will not be in the model's input, so any mention of them would be a fabrication.
+2. KEEP every double-quoted phrase EXACTLY as written, and do not add new quoted phrases
+   unless they are copied word-for-word from the report text above. Do not remove a quote
+   unless the whole sentence around it is an error-block sentence.
+3. KEEP the analyst's reading of the reports (rising / plateauing / near a peak / declining
+   / low and stable) and of the value history (levels, slope, how the index moved over the
+   window). Statements about the baseline forecast itself (its level, what trajectory it
+   implies relative to the last observed value) are allowed — they come from items 1–2.
+4. You MAY add at most two sentences that make the argument stand without the error
+   block: compare the phase the reports describe with the trajectory the baseline forecast
+   implies relative to the origin-week value, using ONLY numbers that appear in items 1–2.
+   Never invent figures, dates, or report content.
+5. The conclusion must stay the same. The edited reasoning must argue for exactly the fixed
+   direction (and, for a move, the fixed size class). Do NOT write Direction / Directions /
+   Size / Sizes / Reason lines; the conclusion lines are added by the training code.
+6. The whole edited text must read as one coherent argument; repair any sentence left
+   dangling by a removal. Keep the analyst's voice and roughly the original length minus
+   the removed material. For a move record keep the "Evidence:" line of the SIZE part if it
+   exists (only its quoted phrases matter; they must remain word-for-word).
+7. If, after removing the error-block material, the report text and value history no longer
+   support the fixed conclusion (for example the only argument for the move was the error
+   pattern), output the single word DROP and nothing else.
+
+--------------------------------------------------------------------------------
+OUTPUT FORMAT (exactly this, no preamble, no markdown)
+--------------------------------------------------------------------------------
+Either the single word
+DROP
+or:
+=== DIRECTION REASONING ===
+<the edited direction reasoning: one flowing paragraph>
+=== SIZE REASONING ===
+<only for a move record: the edited size reasoning — the "Evidence:" line (if it existed),
+a blank line, then one flowing paragraph; omit this whole section for no-change / abstain
+records>

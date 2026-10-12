@@ -11,9 +11,9 @@
 #
 # Usage:  run_cot_pipeline.sh influenza|covid [WORKERS]
 #   influenza : --data-mode influenza           --states GA,NY,NJ  (data/Influenza/{STATE}.csv,
-#               prompts/influenza/chronos2_full/)
-#   covid     : --data-mode covid_TSFM_updated  --states TX,VT,NJ  (data/COVID/cot_ready/final/{STATE}.csv,
-#               prompts/covid/chronos2_full_abs_t3/)
+#               prompts/influenza/)
+#   covid     : --data-mode covid_TSFM_updated  --states TX,VT,NJ  (data/COVID/{STATE}.csv, `split`
+#               column; prompts/covid/)
 # Credentials: Gemini via Vertex AI ADC (export GOOGLE_CLOUD_PROJECT=<project>; gcloud auth
 #              application-default login or GOOGLE_APPLICATION_CREDENTIALS); see code/README.md.
 # Output: $PAPER_OUTPUT_ROOT/cot_corpora/<data_mode>/chronos2_full/<STATES>-gemini/accepted.jsonl

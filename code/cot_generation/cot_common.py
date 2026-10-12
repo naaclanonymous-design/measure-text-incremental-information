@@ -18,10 +18,9 @@ Contents
 * one-directional |r| quantile bins + cold-start lower-edge m_init     (bins / grounding)
 * self-consistency confidence α₁                                       (confidence)
 * verbatim quote extraction + faithfulness check                       (faithfulness)
-* Gemini client, JSONL resume I/O, /scratch symlink                    (infra)
+* Gemini client, JSONL resume I/O, optional scratch symlink            (infra)
 
-The framework this implements is documented in
-``code/agent/SEMANTIC_OPERATOR_COT_FRAMEWORK.md`` (v2.1).
+The 6-stage framework is summarised in code/README.md.
 """
 from __future__ import annotations
 
@@ -288,7 +287,7 @@ FLUVIEW_EXCLUDE = {
 #             are dropped from x_hat / x_gt / target_dates right after sample
 #             building (subset_samples_to_t3). Prompts come from the
 #             chronos2_full_t3 prompt dir (prompt_mode()).
-# covid_TSFM : per-state COVID CSVs (data/COVID_data/datasets, export_covid_csv.py) —
+# covid_TSFM : per-state COVID CSVs (legacy ED-visit index, not part of this release) —
 #             same windowed layout as the influenza CSVs; states GA,NJ,NY. Values are
 #             the NORMALIZED weekly COVID ED-visit proportion: 100 x the smoothed
 #             per-year z-score + 300 index shift (SHIFT300_MANIFEST.md; keeps the
@@ -1381,7 +1380,7 @@ def load_finance_bundle(tickers: Sequence[str],
 def load_covid_bundle(states: Sequence[str],
                       data_dir: Path = COVID_DATA_DIR,
                       label: str = "covid_TSFM") -> DataBundle:
-    """Per-state COVID CSVs (data/COVID_data/export_covid_csv.py), the influenza windowed
+    """Per-state COVID CSVs (data/COVID/{STATE}.csv, code/data_build/build_covid_dataset.py), the influenza windowed
     layout but with MIXED units on disk: hist_12w / chronos2_pred_3w / stat_pred_3w are
     100 x the per-year z-score + 300 index shift (2dp; SHIFT300_MANIFEST.md) while
     future_3w is the full-precision z-score + 3.0. The future values are rescaled here
@@ -1399,7 +1398,7 @@ def load_covid_bundle(states: Sequence[str],
         p = Path(data_dir) / f"{code}.csv"
         if not p.exists():
             raise SystemExit(f"covid input CSV missing for {code!r}: {p} "
-                             f"(run data/COVID_data/export_covid_csv.py first)")
+                             f"(run code/data_build/build_covid_dataset.py first)")
         df = pd.read_csv(p, float_precision="round_trip", keep_default_na=False)
         series: Dict[pd.Timestamp, float] = {}
         for _, r in df.iterrows():

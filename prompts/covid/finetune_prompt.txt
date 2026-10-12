@@ -6,13 +6,10 @@
 2. {baseline_header}
 {baseline_block}
 
-3. Recent 3-WEEK-AHEAD (far-horizon) baseline errors over the last 3 observed weeks — the ABSOLUTE residual, (actual − baseline) in index points (sign: + = baseline too low / under-predicted), directly comparable to the ±20-index-point no-change band:
-{recent_residual_block}
-
-4. {reports_header}
+3. {reports_header}
 {weekly_text_block}
 
-TASK: Reason step by step, then for the SINGLE predicted week — the far horizon, origin + 3 (the nearer weeks origin+1 and origin+2 are NOT being predicted) — decide (a) the DIRECTION the baseline should be revised, and (b) the SIZE of that revision (a magnitude class). Your only target is predicted week 3 (origin + 3): the recent far-horizon errors are your numeric signal.
+TASK: Reason step by step, then for the SINGLE predicted week — the far horizon, origin + 3 (the nearer weeks origin+1 and origin+2 are NOT being predicted) — decide (a) the DIRECTION the baseline should be revised, and (b) the SIZE of that revision (a magnitude class). The baseline forecast extrapolates the recent numeric trend of the index. Read the reports first and decide which phase the epidemic is in (rising / near a peak / declining / low and stable), then judge whether the baseline forecast for predicted week 3 is consistent with that phase given the value history. The reports are your primary evidence; the value history is the context they are read against. Only call increase or decrease when the evidence supports a move clearly larger than the ±20-index-point no-change band away from the baseline; otherwise say no change.
 
 OUTPUT FORMAT — return EXACTLY three parts:
   Reasoning: <one flowing reasoning paragraph>

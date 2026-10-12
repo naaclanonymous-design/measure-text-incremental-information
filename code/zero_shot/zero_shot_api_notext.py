@@ -232,9 +232,10 @@ class GPTZS:
 # ══════════════════════════════════════════════════════════════════════════════
 # Data: the notext test prompts, rebuilt through finetune.py
 # ══════════════════════════════════════════════════════════════════════════════
-# covid_TSFM_bitong_org = the final-fold TEST block of the COVID dataset (TX/VT/NJ, 78 origins)
+# covid_TSFM_bitong_org = the final-fold TEST block of the COVID dataset (TX/VT/NJ, 78 origins);
+# its prompt (prompts/covid/finetune_prompt.txt) has no recent-error item
 COVID_BITONG_MODES = ("covid_TSFM_bitong_org",)
-DEFAULT_CORPUS = {"influenza": "gemini", "covid_TSFM_bitong_org": "gemini"}   # the released original corpora
+DEFAULT_CORPUS = {"influenza": "gemini-final", "covid_TSFM_bitong_org": "gemini-final"}   # the reported runs' corpora
 # finetune run whose test.jsonl carries the same input, per (data_mode, --text)
 _FT = P.FINETUNE_OUTPUT_ROOT
 REFERENCE_RUN_BY_MODE = {
@@ -564,7 +565,7 @@ def main():
     data_dir, combo, run_dir, horizon, bins, test, prompts, sysp = build_test_prompts(args, states)
     reports = ("FluView reports" if args.data_mode == "influenza"
                else "state respiratory surveillance reports")
-    errs = "recent errors + "
+    errs = "recent errors + " if args.data_mode == "influenza" else ""   # the COVID prompt has no error item
     input_desc = (f"history + chronos2 baseline + {errs}notext stub (no {reports})"
                   if args.text == "drop" else
                   f"history + chronos2 baseline + {errs}PLAIN {reports} of the "

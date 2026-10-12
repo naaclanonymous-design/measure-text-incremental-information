@@ -38,6 +38,14 @@ relative ±10 % band, 3 target weeks) and `covid_TSFM_updated` (reads
 origin + 3 only). `--model GPT` switches the teacher and
 judges to OpenAI models.
 
+## `data_augmentation/` — from the pipeline output to the `-gemini-final` corpora
+
+`build_complete_corpus.py` (influenza: every passing Step-1 CoT of a train origin becomes its own
+row, 310 → 653 train rows), `build_abstain_fix_corpus.py` (COVID: input-specific reasoning for the
+abstain origins, contradictory ones dropped) and `rewrite_cot_corpus.py` (COVID "nores": the CoTs
+are rewritten to not cite the recent-error block, matching `prompts/covid/finetune_prompt.txt`).
+Their prompts are in `data_augmentation/prompts/`; details in `data_augmentation/README.md`.
+
 ## `finetune/` — LoRA finetuning of Qwen3-8B (ms-swift) and evaluation
 
 `finetune.py --data-mode {influenza, covid_TSFM_bitong, ...} --mode chronos2_full
@@ -67,9 +75,8 @@ judges to OpenAI models.
 
 sbatch wrappers (submit from `code/finetune/`; slurm output lands next to the script): `run_finetune_influenza_scale.sbatch`,
 `run_finetune_influenza_original.sbatch`, `run_finetune_covid_scale.sbatch`,
-`run_finetune_covid_original.sbatch`. They train on the released original corpora; the reported
-numbers used derived training corpora / a prompt variant that are not part of this release (see
-the root README). Append `--data-only` to only write the train/val/test
+`run_finetune_covid_original.sbatch`. They train on the `-gemini-final` corpora of the reported runs
+(`--corpus-model gemini` switches to the plain 6-stage output). Append `--data-only` to only write the train/val/test
 prompt files. Defaults: LoRA r 8 / α 16 / dropout 0.05, batch 1 × 16, max 16 384 tokens
 (24 576 for COVID), bf16, seed 42, greedy inference with 1 536 new tokens.
 
@@ -77,7 +84,7 @@ prompt files. Defaults: LoRA r 8 / α 16 / dropout 0.05, batch 1 × 16, max 16 3
 
 * `zero_shot_api_notext.py` — the **operator** zero-shot test: Gemini-3.1-pro (thinking level
   *low*, its floor) and GPT-5.4 (`reasoning_effort=none`) answer the finetune prompt of the
-  test rows. `--text keep` = history + baseline + recent errors + the last 5 weeks of reports; `--text drop` = the report block replaced by the notext stub. Scored
+  test rows. `--text keep` = history + baseline + recent errors (influenza only) + the last 5 weeks of reports; `--text drop` = the report block replaced by the notext stub. Scored
   exactly like the finetuned operator (direction / size accuracy, rough MAE vs Chronos-2).
   `run_zero_shot.sh influenza|covid [keep|drop|both] [gemini,gpt]`.
 * `zero_shot_api_direct.py` — the **direct** zero-shot test: no baseline in the prompt, the

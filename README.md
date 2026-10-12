@@ -17,8 +17,8 @@ paper-content/
 │   │                         chronos2/*.csv                                               -> README
 │   ├── raw/                  NHSN admissions (COVID long table, influenza panel), FluSight
 │   │                         populations, the split-date json                           -> README
-│   └── cot_corpora/          the ORIGINAL (non-augmented) CoT corpora of the 6-stage pipeline:
-│                             influenza/GA_NY_NJ-gemini/, covid/TX_VT_NJ-gemini/            -> README
+│   └── cot_corpora/          CoT corpora: <STATES>-gemini = the plain 6-stage pipeline output,
+│                             <STATES>-gemini-final = the corpus of the reported run           -> README
 ├── prompts/                  one flat directory per prompt set                             -> README
 │   ├── influenza/            CoT generation + judges + finetune prompt (influenza, 153.7 MAE)
 │   ├── covid/                CoT generation + judges + finetune prompt (COVID)
@@ -31,6 +31,8 @@ paper-content/
 │   │                         chronos2_influenza.py (multivariate), run_chronos2.sbatch
 │   ├── cot_generation/       cot_common.py, step1_generate/filter.py, step2_generate/filter.py,
 │   │                         build_global_bins.py, run_cot_pipeline.sh (the 6 stages)
+│   ├── data_augmentation/    how the -gemini-final corpora were derived: influenza training-set
+│   │                         expansion, COVID abstain fix + nores rewrite (+ their prompts)   -> README
 │   ├── finetune/             finetune.py (--method scale | original), train_grounding.py,
 │   │                         apply_state_gate.py, finetune_residual_cot.py, 4 sbatch scripts
 │   └── zero_shot/            zero_shot_api_notext.py (operator test, --text keep|drop),
@@ -78,7 +80,9 @@ python code/data_build/build_covid_dataset.py   # z26w normalisation -> data/COV
 # 2. CoT generation (6 stages, Gemini) -> output/cot_corpora/<data_mode>/chronos2_full/<STATES>-gemini/
 code/cot_generation/run_cot_pipeline.sh influenza 8
 code/cot_generation/run_cot_pipeline.sh covid 4
-#    (skip to use the released originals in data/cot_corpora/ — all code falls back to them)
+#    (skip to use the released corpora in data/cot_corpora/ — all code falls back to them;
+#     --corpus-model gemini = plain pipeline output, gemini-final = the reported run's corpus,
+#     derived from the plain output by code/data_augmentation/, see its README)
 
 # 3. finetuning (GPU, ms-swift LoRA) -> output/finetune/...
 cd code/finetune
